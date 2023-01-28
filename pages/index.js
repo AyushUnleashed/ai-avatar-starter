@@ -6,16 +6,41 @@ import profileLogo from '../assets/profile_image.jpg';
 import { useState } from 'react';
 
 const Home = () => {
+  //to store input 
   const [input,setInput] = useState('');
+  //to store image
+  const[img,setImage] = useState('');
 
   const onChange = (event) =>{
     setInput(event.target.value);
     console.log({input});
   };
 
-  const generateAction = ()=>{
+  const generateAction = async () => {
     console.log("Generate btn Works");
-  }
+
+    const response = await fetch("/api/generate",{
+      method: 'POST',
+      headers: {'Content-Type':'image/jpeg'},
+      body: JSON.stringify({input})
+    });
+
+    const data = await response.json();
+
+    // Model is still loading
+    if(response.status == 503){
+      console.log("Model is still loading");
+      return;
+    }
+
+    //if another Error
+    if(!response.ok){
+      console.log("Error: ${data.error} ");
+      return;
+    }
+
+    setImage(data.img);
+  };
 
   return (
     <div className="root">
